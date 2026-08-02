@@ -1,6 +1,5 @@
 "use client";
 
-import { createChat } from "@n8n/chat";
 import { useEffect } from "react";
 
 const CHAT_TARGET = "#n8n-chat";
@@ -13,56 +12,64 @@ export default function ChatWidget() {
     if (!target) return;
 
     target.replaceChildren();
+    let mounted = true;
+    let chat: { unmount: () => void } | undefined;
+    let observer: MutationObserver | undefined;
 
-    const chat = createChat({
-      webhookUrl: CHAT_WEBHOOK_URL,
-      target: CHAT_TARGET,
-      mode: "window",
-      showWindowCloseButton: true,
-      showWelcomeScreen: false,
-      loadPreviousSession: false,
-      enableStreaming: true,
-      allowFileUploads: false,
-      initialMessages: [
-        "Здравствуйте! Я ИИ-помощник Василия. Расскажите, какую задачу вы хотите автоматизировать или задайте свой вопрос.",
-      ],
-      metadata: {
-        source: "website",
-        site: "autobiz-vb.github.io",
-      },
-      i18n: {
-        en: {
-          title: "ИИ-консультант",
-          subtitle: "Задайте вопрос об автоматизации — отвечу в чате.",
-          footer: "Ответы формирует ИИ",
-          getStarted: "Начать диалог",
-          inputPlaceholder: "Напишите ваш вопрос…",
-          closeButtonTooltip: "Закрыть чат",
+    void import("@n8n/chat").then(({ createChat }) => {
+      if (!mounted) return;
+
+      chat = createChat({
+        webhookUrl: CHAT_WEBHOOK_URL,
+        target: CHAT_TARGET,
+        mode: "window",
+        showWindowCloseButton: true,
+        showWelcomeScreen: false,
+        loadPreviousSession: false,
+        enableStreaming: true,
+        allowFileUploads: false,
+        initialMessages: [
+          "Здравствуйте! Я ИИ-помощник Василия. Расскажите, какую задачу вы хотите автоматизировать или задайте свой вопрос.",
+        ],
+        metadata: {
+          source: "website",
+          site: "autobiz-vb.github.io",
         },
-      },
+        i18n: {
+          en: {
+            title: "ИИ-консультант",
+            subtitle: "Задайте вопрос об автоматизации — отвечу в чате.",
+            footer: "Ответы формирует ИИ",
+            getStarted: "Начать диалог",
+            inputPlaceholder: "Напишите ваш вопрос…",
+            closeButtonTooltip: "Закрыть чат",
+          },
+        },
+      });
+
+      const labelToggle = () => {
+        const toggle = target.querySelector<HTMLElement>(".chat-window-toggle");
+        if (!toggle) return;
+        toggle.setAttribute("aria-label", "Открыть ИИ-консультанта");
+        toggle.setAttribute("role", "button");
+        toggle.setAttribute("tabindex", "0");
+        if (toggle.dataset.keyboardReady) return;
+        toggle.dataset.keyboardReady = "true";
+        toggle.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          toggle.click();
+        });
+      };
+      observer = new MutationObserver(labelToggle);
+      observer.observe(target, { childList: true, subtree: true });
+      labelToggle();
     });
 
-    const labelToggle = () => {
-      const toggle = target.querySelector<HTMLElement>(".chat-window-toggle");
-      if (!toggle) return;
-      toggle.setAttribute("aria-label", "Открыть ИИ-консультанта");
-      toggle.setAttribute("role", "button");
-      toggle.setAttribute("tabindex", "0");
-      if (toggle.dataset.keyboardReady) return;
-      toggle.dataset.keyboardReady = "true";
-      toggle.addEventListener("keydown", (event) => {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        toggle.click();
-      });
-    };
-    const observer = new MutationObserver(labelToggle);
-    observer.observe(target, { childList: true, subtree: true });
-    labelToggle();
-
     return () => {
-      observer.disconnect();
-      chat.unmount();
+      mounted = false;
+      observer?.disconnect();
+      chat?.unmount();
       target.replaceChildren();
     };
   }, []);
