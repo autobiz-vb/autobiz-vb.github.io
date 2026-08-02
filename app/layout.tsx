@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
-import "@n8n/chat/style.css";\nimport "./globals.css";\nimport ChatWidget from "./ChatWidget";
+import "@n8n/chat/style.css";
+import "./globals.css";
+import ChatWidget from "./ChatWidget";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://autobiz-vb.github.io"),
@@ -47,7 +49,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body>\n        {children}\n        <ChatWidget />\n      </body>
+      <body>
+        {children}
+        <ChatWidget />
+      </body>
     </html>
   );
 }
