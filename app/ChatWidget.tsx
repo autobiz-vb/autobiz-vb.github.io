@@ -15,6 +15,7 @@ export default function ChatWidget() {
     let mounted = true;
     let chat: { unmount: () => void } | undefined;
     let observer: MutationObserver | undefined;
+    let removeCloseButtonFix: (() => void) | undefined;
 
     void import("@n8n/chat").then(({ createChat }) => {
       if (!mounted) return;
@@ -47,8 +48,38 @@ export default function ChatWidget() {
         },
       });
 
+      // В текущей версии @n8n/chat кнопка в заголовке отправляет событие
+      // закрытия, но оконный контейнер его не обрабатывает. Делегированный
+      // обработчик использует рабочий переключатель виджета и сохраняет
+      // одинаковое поведение для мыши, клавиатуры и сенсорного экрана.
+      const closeFromHeader = (event: Event) => {
+        const clickedElement = event.target;
+        if (
+          !(clickedElement instanceof Element) ||
+          !clickedElement.closest(".chat-close-button")
+        ) {
+          return;
+        }
+
+        const toggle = target.querySelector<HTMLElement>(".chat-window-toggle");
+        const chatWindow = target.querySelector<HTMLElement>(".chat-window");
+        if (!toggle || !chatWindow) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        toggle.click();
+      };
+
+      target.addEventListener("click", closeFromHeader, true);
+      removeCloseButtonFix = () =>
+        target.removeEventListener("click", closeFromHeader, true);
+
       const labelToggle = () => {
         const toggle = target.querySelector<HTMLElement>(".chat-window-toggle");
+        const closeButton =
+          target.querySelector<HTMLButtonElement>(".chat-close-button");
+        closeButton?.setAttribute("aria-label", "Закрыть чат");
         if (!toggle) return;
         toggle.setAttribute("aria-label", "Открыть ИИ-консультанта");
         toggle.setAttribute("role", "button");
@@ -69,6 +100,7 @@ export default function ChatWidget() {
     return () => {
       mounted = false;
       observer?.disconnect();
+      removeCloseButtonFix?.();
       chat?.unmount();
       target.replaceChildren();
     };
