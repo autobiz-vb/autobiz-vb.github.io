@@ -18,6 +18,21 @@ export const metadata: Metadata = {
     siteName: "Автоматизация бизнес-процессов",
     locale: "ru_RU",
     type: "website",
+    images: [
+      {
+        url: "/og-preview.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Автоматизация бизнес-процессов — Google Таблицы, n8n, боты и ИИ",
+        type: "image/jpeg",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Автоматизация бизнес-процессов — Google Таблицы, n8n, боты и ИИ",
+    description: "Автоматизация учёта, отчётности и рабочих процессов: Google Таблицы, Apps Script, n8n, боты и ИИ.",
+    images: ["/og-preview.jpg"],
   },
   icons: {
     icon: "/favicon.svg",
