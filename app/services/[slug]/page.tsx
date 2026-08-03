@@ -11,17 +11,26 @@ export async function generateMetadata({params}:{params:Promise<{slug:string}>})
   const {slug}=await params;
   const direction=getServiceDirection(slug);
   if(!direction) return {};
-  const canonical=`https://autobiz-vb.github.io/services/${direction.slug}/`;
+  const canonical=`/services/${direction.slug}`;
+  const seo=direction.seo;
+  const cover=direction.solutions[0]?.screenshots[0];
   return {
-    title:direction.title,
-    description:direction.description,
+    title:seo?.title||`${direction.title} — Автоматизация бизнес-процессов`,
+    description:seo?.description||direction.description,
     alternates:{canonical},
     openGraph:{
-      title:direction.title,
-      description:direction.description,
+      title:seo?.openGraphTitle||direction.title,
+      description:seo?.openGraphDescription||direction.description,
       url:canonical,
-      type:"website",
+      type:"article",
       locale:"ru_RU",
+      images:cover?[{url:cover.src,width:1600,height:900,alt:cover.alt}]:undefined,
+    },
+    twitter:{
+      card:"summary_large_image",
+      title:seo?.openGraphTitle||direction.title,
+      description:seo?.openGraphDescription||direction.description,
+      images:cover?[cover.src]:undefined,
     },
   };
 }
@@ -62,11 +71,33 @@ export default async function ServicePage({params}:{params:Promise<{slug:string}
           <div className="implementationNote"><div><small>Пример решения</small><p>{solution.implementation}</p></div><div><small>Результат</small><p>{solution.result}</p></div></div>
           {solution.note&&<p className="truthNote">{solution.note}</p>}
 
+          {solution.details&&<div className="caseStory" aria-label="Как работает система">
+            {solution.details.map((detail,index)=><section className="caseStorySection" key={detail.title}>
+              <div className="caseStoryNumber" aria-hidden="true">0{index+1}</div>
+              <div className="caseStoryBody">
+                <p className="kicker">{detail.eyebrow}</p>
+                <h3>{detail.title}</h3>
+                {detail.paragraphs.map(paragraph=><p key={paragraph}>{paragraph}</p>)}
+                {detail.points&&<ul>{detail.points.map(point=><li key={point}>{point}</li>)}</ul>}
+              </div>
+            </section>)}
+          </div>}
+
+          {solution.architecture&&<section className="caseArchitecture" aria-labelledby={`${solution.id}-architecture`}>
+            <div className="architectureIntro">
+              <p className="kicker">Архитектура решения</p>
+              <h3 id={`${solution.id}-architecture`}>{solution.architecture.title}</h3>
+              <p>{solution.architecture.description}</p>
+              <div className="technologyChips" aria-label="Технологии">{solution.architecture.technologies.map(item=><span key={item}>{item}</span>)}</div>
+            </div>
+            <ol className="architectureModules">{solution.architecture.modules.map((item,index)=><li key={item}><span>{String(index+1).padStart(2,"0")}</span>{item}</li>)}</ol>
+          </section>}
+
           <div className="galleryHeading"><div><p className="kicker">Рабочие экраны</p><h3>Как выглядит решение</h3></div><span>{solution.screenshots.length} скриншотов</span></div>
           <Gallery shots={solution.screenshots}/>
 
           <div className="caseCta">
-            <div><h3>{solution.cta?"Получите готовый шаблон":"Хотите похожую систему для своего бизнеса?"}</h3><p>{solution.cta?"Посмотрите подробное описание бесплатного решения и все условия использования.":"Проведу бесплатный аудит процесса и предложу подходящую структуру решения."}</p></div>
+            <div><h3>{solution.cta?.title||(solution.cta?"Получите готовый шаблон":"Хотите похожую систему для своего бизнеса?")}</h3><p>{solution.cta?.text||(solution.cta?"Посмотрите подробное описание бесплатного решения и все условия использования.":"Проведу бесплатный аудит процесса и предложу подходящую структуру решения.")}</p></div>
             <a className="btn primary" href={solution.cta?.href||"/#contact"}>{solution.cta?.label||"Обсудить задачу"} ↗</a>
           </div>
         </div>
