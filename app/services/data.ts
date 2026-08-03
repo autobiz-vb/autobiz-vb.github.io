@@ -102,7 +102,8 @@ const cabinetScreens = [
   ["financial-cabinet-07-budget-limits.png","Бюджеты и лимиты","Контроль бюджета и установленных лимитов"],
 ] as const;
 
-// Изображения кейса Telegram-системы аренды.\nconst rentalBotScreens = [
+// Изображения кейса Telegram-системы аренды.
+const rentalBotScreens = [
   ["rental-bot-01-cover.webp","Система контроля аренды","Telegram-система контроля аренды и временной регистрации"],
   ["rental-bot-02-client-menu.webp","Меню жильца","Меню нового и действующего жильца в Telegram"],
   ["rental-bot-03-admin-dashboard.webp","Администраторское меню","Меню администратора и ежедневная сводка"],
