@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {useEffect,useState} from "react";
 import CaseCard from "./CaseCard";
+import SiteFooter from "../SiteFooter";
 import {caseCatalog,caseCategoryLabels,type CaseCategory} from "../services/data";
 
 type SelectedCategory = "all" | CaseCategory;
@@ -72,6 +73,6 @@ export default function CasesPageClient(){
     </div></section>
 
     <section className="catalogCta"><div className="container"><div><p className="kicker">Есть похожая задача?</p><h2>Разберём процесс и подберём подходящее решение</h2></div><Link className="btn primary" href="/#contact">Обсудить задачу ↗</Link></div></section>
-    <footer><div className="container"><div>© 2026 Автоматизация бизнес-процессов</div><div><a href="https://t.me/VasiliyPF" target="_blank" rel="noreferrer">Telegram</a><a href="https://vk.com/autobizvb" target="_blank" rel="noreferrer">ВКонтакте</a></div></div></footer>
+    <SiteFooter/>
   </main>;
 }

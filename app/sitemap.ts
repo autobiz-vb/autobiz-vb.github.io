@@ -12,6 +12,8 @@ export default function sitemap():MetadataRoute.Sitemap{
     {url:`${origin}/`,lastModified:now,changeFrequency:"monthly",priority:1},
     {url:`${origin}/cases/`,lastModified:now,changeFrequency:"monthly",priority:.9},
     {url:`${origin}/free-solutions/`,lastModified:now,changeFrequency:"monthly",priority:.8},
+    {url:`${origin}/personal-data-consent/`,lastModified:now,changeFrequency:"yearly",priority:.3},
+    {url:`${origin}/privacy-policy/`,lastModified:now,changeFrequency:"yearly",priority:.3},
     ...serviceDirections.map(direction=>({
       url:`${origin}/services/${direction.slug}/`,
       lastModified:now,

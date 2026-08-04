@@ -4,6 +4,7 @@ import Link from "next/link";
 import {notFound} from "next/navigation";
 import Gallery from "../Gallery";
 import {getServiceDirection, serviceDirections} from "../data";
+import SiteFooter from "../../SiteFooter";
 
 export function generateStaticParams(){return serviceDirections.map(item=>({slug:item.slug}))}
 
@@ -104,6 +105,6 @@ export default async function ServicePage({params}:{params:Promise<{slug:string}
       </article>)}
     </div>
 
-    <footer><div className="container"><div>© 2026 Автоматизация бизнес-процессов</div><div><a href="https://t.me/VasiliyPF" target="_blank" rel="noreferrer">Telegram</a><a href="https://vk.com/autobizvb" target="_blank" rel="noreferrer">ВКонтакте</a></div></div></footer>
+    <SiteFooter/>
   </main>
 }
