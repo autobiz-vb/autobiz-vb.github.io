@@ -5,6 +5,7 @@ import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 import CaseCard from "./cases/CaseCard";
 import {caseCatalog} from "./services/data";
 import SiteFooter from "./SiteFooter";
+import {trackVkGoal} from "./VkPixel";
 
 const services = [
   {title:"Учёт, расчёты и отчётность",tech:"Google Таблицы и Apps Script",icon:"▦",accent:"green",description:"Автоматизация учёта, расчётов, документов и регулярной отчётности.",tasks:["расчёт выплат и комиссий","контроль продаж и остатков","автоматическое формирование отчётов"],intro:"Автоматизирую процессы, которые сейчас ведутся вручную в таблицах, блокнотах, чатах или нескольких несвязанных файлах.",solve:["управленческий и финансовый учёт","расчёт зарплат, процентов, комиссий и взаиморасчётов","учёт продаж, расходов, товаров и остатков","автоматическое формирование ежедневных и ежемесячных отчётов","сбор данных через удобные веб-формы","загрузка данных из маркетплейсов, банков и других систем","автоматическая проверка ошибок и расхождений","отправка уведомлений и готовых отчётов"],examples:["отчёт руководителя с основными показателями","расчёт выплат сотрудникам или исполнителям","складской учёт и контроль остатков","сверка банковских поступлений с продажами","автоматическая обработка реестров","мобильная форма для внесения данных сотрудниками"],result:["меньше ручного заполнения","снижение количества ошибок","единые и актуальные данные","быстрый контроль бизнеса","экономия времени сотрудников","понятная система вместо множества файлов"],price:"Небольшие доработки — от 1 000 ₽. Простая автоматизация — от 2 000 ₽"},
@@ -137,7 +138,7 @@ export default function Home(){
     e.preventDefault(); setState("sending"); const form=e.currentTarget;
     try{
       const r=await fetch("/api/lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(Object.fromEntries(new FormData(form).entries()))});
-      if(!r.ok) throw new Error(); form.reset(); setState("sent");
+      if(!r.ok) throw new Error(); trackVkGoal("lead_submit_success"); form.reset(); setState("sent");
     }catch{setState("error")}
   }
   return <main>
