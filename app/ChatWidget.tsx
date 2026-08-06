@@ -4,7 +4,8 @@ import { useEffect } from "react";
 
 const CHAT_TARGET = "#n8n-chat";
 const CHAT_WEBHOOK_URL =
-  "https://n8n.vbn8n.online/webhook/6d980824-275a-4661-a8cb-f2744358a760/chat";
+  "https://n8n.vbn8n.online/webhook/1f55b958-a366-4082-9d16-71e322eeed66/chat";
+const SKIP_QUESTION_MESSAGE = "Пропустить этот вопрос";
 
 const QUICK_REPLY_GROUPS: Record<string, string[]> = {
   "Google Таблицы / Excel": [
@@ -73,6 +74,8 @@ export default function ChatWidget() {
     let quickReplySending = false;
     let quickReplySubmit = false;
     let quickReplyPanel: HTMLDivElement | undefined;
+    let skipQuestionControl: HTMLDivElement | undefined;
+    let skipQuestionSending = false;
     const quickReplyObservers = new Set<MutationObserver>();
     const quickReplyTimers = new Set<ReturnType<typeof setTimeout>>();
 
@@ -215,6 +218,57 @@ export default function ChatWidget() {
       }
     };
 
+    const renderSkipQuestion = () => {
+      const footer = target.querySelector<HTMLElement>(".chat-footer");
+      const input = footer?.querySelector<HTMLElement>(".chat-input");
+      const textarea = input?.querySelector<HTMLTextAreaElement>("textarea");
+      if (!footer || !input) return;
+
+      if (!skipQuestionControl) {
+        skipQuestionControl = document.createElement("div");
+        skipQuestionControl.className = "chat-skip-question";
+
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "chat-skip-question-button";
+        button.textContent = "Пропустить вопрос";
+        button.setAttribute(
+          "aria-label",
+          "Пропустить текущий вопрос ИИ-консультанта",
+        );
+        button.addEventListener("click", async () => {
+          if (skipQuestionSending) return;
+
+          skipQuestionSending = true;
+          button.disabled = true;
+          const sent = await sendQuickReply(SKIP_QUESTION_MESSAGE);
+          if (sent) {
+            finishQuickReplies();
+          }
+
+          // Основной виджет блокирует поле ввода до получения ответа.
+          // Небольшая задержка защищает от повторного клика, а дальнейшее
+          // состояние синхронизируется с полем ввода при изменении чата.
+          window.setTimeout(() => {
+            skipQuestionSending = false;
+            renderSkipQuestion();
+          }, 1_200);
+        });
+        skipQuestionControl.append(button);
+      }
+
+      const button = skipQuestionControl.querySelector<HTMLButtonElement>(
+        ".chat-skip-question-button",
+      );
+      if (button) {
+        button.disabled = skipQuestionSending || Boolean(textarea?.disabled);
+      }
+
+      if (!skipQuestionControl.isConnected) {
+        footer.insertBefore(skipQuestionControl, input);
+      }
+    };
+
     void import("@n8n/chat").then(({ createChat }) => {
       if (!mounted) return;
 
@@ -343,6 +397,7 @@ export default function ChatWidget() {
       const syncWidgetEnhancements = () => {
         labelToggle();
         renderQuickReplies();
+        renderSkipQuestion();
       };
       observer = new MutationObserver(syncWidgetEnhancements);
       observer.observe(target, { childList: true, subtree: true });

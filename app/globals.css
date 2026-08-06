@@ -108,6 +108,37 @@
   cursor: wait;
 }
 
+#n8n-chat .chat-skip-question {
+  padding: 7px 12px 8px;
+  display: flex;
+  justify-content: flex-end;
+  background: rgba(7, 17, 38, 0.96);
+}
+
+#n8n-chat .chat-skip-question-button {
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #b8c8dc;
+  font: 600 12px/1.25 Inter, Arial, sans-serif;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+#n8n-chat .chat-skip-question-button:hover,
+#n8n-chat .chat-skip-question-button:focus-visible {
+  color: #7cf29a;
+  outline: 2px solid rgba(124, 242, 154, 0.38);
+  outline-offset: 1px;
+}
+
+#n8n-chat .chat-skip-question-button:disabled {
+  opacity: 0.48;
+  cursor: wait;
+}
+
 @media (max-width: 650px) {
   :root {
     --chat--window--width: calc(100vw - 16px);
